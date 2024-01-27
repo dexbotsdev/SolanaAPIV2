@@ -70,7 +70,7 @@ const main = async (emitter) => {
                             usdcpair = true; 
                         }
                     }
-                     console.log(info.meta.postTokenBalances);
+                     //console.log(info.meta.postTokenBalances);
         
                     const baseLP =  solpair?info.meta.postTokenBalances.filter((item)=>item.accountIndex ==5||item.accountIndex ==2)[0].uiTokenAmount.uiAmount:info.meta.postTokenBalances.filter((item)=>item.accountIndex ==4)[0].uiTokenAmount.uiAmount
                     const quoteLP =  solpair?info.meta.postTokenBalances.filter((item)=>item.accountIndex ==6|| item.accountIndex ==1)[0].uiTokenAmount.uiAmount:info.meta.postTokenBalances.filter((item)=>item.accountIndex ==5)[0].uiTokenAmount.uiAmount
@@ -96,12 +96,12 @@ const main = async (emitter) => {
                             token = await getToken(new PublicKey(quoteMint));
                             tokenX = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(quoteMint) });
         
-                            //console.log('quoteMintbaseMint '+ baseMint)
+                            // console.log('quoteAs baseMint '+ baseMint)
         
         
                           } else {
         
-                            //console.log('baseMint '+ baseMint)
+                            // console.log('baseMint '+ baseMint)
                             token = await getToken(new PublicKey(baseMint));
                             tokenX = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(baseMint) });
         

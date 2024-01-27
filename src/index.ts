@@ -1,22 +1,23 @@
 import { EventEmitter } from 'emitter'
 import WebSocket from 'ws';
-
+ 
 import { findUser } from "./db/db";
 import main from "./NewPoolFinder";
 import mainBurn from "./NewBurnFinder";
 import mainRugpull from './RugPullFinder';
 const eventEmitter = new EventEmitter();
+export const newburnsChannelId="-1002063926369";
 
 eventEmitter.setMaxListeners(999);
 
-const MAX_CONNECTIONS_PER_USER = 2;
+const MAX_CONNECTIONS_PER_USER = 1111112;
 const userConnections = new Map();
 const AUTH_HEADER_KEY = 'authorization';
 const newPoolSubscriptions = new Map();
 const newBurnSubscriptions = new Map();
 const rugPullSubscriptions = new Map();
 
-const wss = new WebSocket.Server({
+ const wss = new WebSocket.Server({
   port: Number(process.env.PORT),
   perMessageDeflate: {
     zlibDeflateOptions: {
@@ -69,7 +70,7 @@ wss.on('connection', (ws, req) => {
       return;
     };
 
-    const userId = 'shree';//result.userId;
+    const userId = result.userId;
     //console.log(result);
     const userConnectionCount = userConnections.get(userId) || 0;
     if (userConnectionCount < MAX_CONNECTIONS_PER_USER) {
@@ -78,7 +79,7 @@ wss.on('connection', (ws, req) => {
       // Increment the connection count for the user 
       userConnections.set(userId, userConnectionCount + 1);
 
-      //console.log(`User ${userId} authenticated with ${userConnectionCount + 1} connection(s)`);
+       console.log(`User ${userId} authenticated with ${userConnectionCount + 1} connection(s)`);
 
       ws.send(' Authenticated for new Pools ' + endPoint);
 
@@ -90,23 +91,14 @@ wss.on('connection', (ws, req) => {
       if (endPoint == 'rugPulls')
         rugPullSubscriptions.set(`${userId}_${userConnectionCount}`, ws);
 
-
-
-      // Handle messages from authenticated clients
-      ws.on('message', (message) => {
-        //console.log(`Received message from authenticated client (user: ${userId}): ${message}`);
-
-        // Sending a message to a specific user (change the userId accordingly)
-        const specificUserWebSocket = newPoolSubscriptions.get(`${userId}_1`); // assuming you want to send to the first connection
-        if (specificUserWebSocket && specificUserWebSocket.readyState === WebSocket.OPEN) {
-          specificUserWebSocket.send(`Private message from server: ${message}`);
-        }
-      });
+ 
 
       // Handle the connection close event
       ws.on('close', () => {
         // Decrement the connection count for the user when a connection is closed
-
+        const userConnectionCount = userConnections.get(userId) || 0;
+        
+      if(userConnectionCount>1)
         userConnections.set(userId, userConnectionCount - 1);
 
         console.log(`Connection closed for user ${userId}. Remaining connections: ${userConnectionCount - 1}`);
@@ -130,12 +122,14 @@ eventEmitter.on('newListener', (event: string, listener: any) => {
 
 
 eventEmitter.on('NewPool', async (ammPool: string) => {
-  console.log('Recieved NewPool');
-  console.log(ammPool);
+  console.log('Recieved NewPool '+new Date().toString());
+ // console.log(ammPool);
   newPoolSubscriptions.forEach(conn => {
-    const specificUserWebSocket = conn; // assuming you want to send to the first connection
+    const specificUserWebSocket : WebSocket = conn; // assuming you want to send to the first connection
     if (specificUserWebSocket && specificUserWebSocket.readyState === WebSocket.OPEN) {
-      specificUserWebSocket.send(ammPool);
+      specificUserWebSocket.send(ammPool, (error)=>{
+        console.log(error)
+      });
     }
   })
 });
@@ -148,17 +142,21 @@ eventEmitter.on('NewBurn', async (ammPool: string) => {
   newBurnSubscriptions.forEach(conn => {
     const specificUserWebSocket = conn; // assuming you want to send to the first connection
     if (specificUserWebSocket && specificUserWebSocket.readyState === WebSocket.OPEN) {
-      specificUserWebSocket.send(ammPool);
+      specificUserWebSocket.send(ammPool, (error)=>{
+        console.log(error)
+      });
     }
   })
 });
 eventEmitter.on('RugPull', async (ammPool: string) => {
   console.log('Recieved RugPull');
-  console.log(ammPool);
+ // console.log(ammPool);
   rugPullSubscriptions.forEach(conn => {
     const specificUserWebSocket = conn; // assuming you want to send to the first connection
     if (specificUserWebSocket && specificUserWebSocket.readyState === WebSocket.OPEN) {
-      specificUserWebSocket.send(ammPool);
+      specificUserWebSocket.send(ammPool, (error)=>{
+        console.log(error)
+      });
     }
   })
 });
@@ -172,6 +170,7 @@ eventEmitter.on('Disconnected', (message: string) => {
 });
 
 
-//main(eventEmitter);
+
+main(eventEmitter);
 mainBurn(eventEmitter);
-//mainRugpull(eventEmitter);
+mainRugpull(eventEmitter);

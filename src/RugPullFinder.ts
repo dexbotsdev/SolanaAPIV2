@@ -72,12 +72,12 @@ const mainRugpull = async (emitter) => {
                     if (removerAuthority == tokenAuthority) {
     
     
-                        console.log(Number(postTokenBalance.uiTokenAmount.amount) / Number(preTokenBalance.uiTokenAmount.amount))
+                       // console.log(Number(postTokenBalance.uiTokenAmount.amount) / Number(preTokenBalance.uiTokenAmount.amount))
     
     
-                        console.log('Remover ' + tokenX.name);
-                        console.log('Remover ' + removerAuthority);
-                        console.log('tokenAuthority ' + tokenAuthority);
+                       // console.log('Remover ' + tokenX.name);
+                       // console.log('Remover ' + removerAuthority);
+                       // console.log('tokenAuthority ' + tokenAuthority);
                         console.log('Real RugPull ' + logs.signature);
     
     
@@ -91,7 +91,7 @@ const mainRugpull = async (emitter) => {
     
                         }
     
-                        console.log(rugPull);
+                      //  console.log(rugPull);
     
     
                         emitter.emit('RugPull', JSON.stringify(rugPull));
@@ -108,7 +108,7 @@ const mainRugpull = async (emitter) => {
     
                             const updated = await updateMarket(isToken.id, rugpulled);
     
-                             console.log(updated);
+                           //  console.log(updated);
     
     
                         }

@@ -1,15 +1,17 @@
-import { PublicKey  } from "@solana/web3.js";
-import { HELIUS_RPC_A, HELIUS_RPC_API, connection2, connection3  , connectionH } from './util/constants';
+import { PublicKey } from "@solana/web3.js";
+import { HELIUS_RPC_A, HELIUS_RPC_API, connection2, connection3, connectionH } from './util/constants';
 import { findLpMint, updateMarket } from "./db/db";
 import parseBurnTx from "./util/parseBurn";
 import axios from "axios";
-import {TOKEN_PROGRAM_ID,  getAccount} from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getAccount } from "@solana/spl-token";
+import { SPL_MINT_LAYOUT } from "@raydium-io/raydium-sdk";
 
 const exclude = ['DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263']
+const AmmAuth="5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1";
 
 const pubtok = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const getToken = async (mint: any) => {
-    return await connectionH.getParsedAccountInfo(new PublicKey(mint), "confirmed");
+    return await connection3.getParsedAccountInfo(new PublicKey(mint), "confirmed");
 }
 
 
@@ -44,50 +46,23 @@ const mainBurn = async (emitter) => {
                 "maxSupportedTransactionVersion": 0,
                 "commitment": 'confirmed'
             });
+            const isBurnTx: any = testix?.transaction.message.instructions.filter((ix: any) => ix?.parsed?.type == 'burn')
+            const postbalance: any = testix?.meta?.postTokenBalances
 
-            const isburn = await parseBurnTx(testix, undefined);
 
-            if (isburn && !exclude.includes(isburn.mint)) {
-                 console.log(isburn);
 
-                //console.log(await getToken(isburn.mint)); 
-                const isToken = await findLpMint(isburn.mint);
-                console.log(isToken );
+            if (isBurnTx && isBurnTx.length > 0) {
+                const burnd = isBurnTx[0];
+
+                console.log(new Date());
+                //console.log(isBurnTx[0]);
  
-                const lpMint = new PublicKey(isburn.mint);
-
-                const tokenInfo =  await getAccount(
-                    connection3,
-                    lpMint,
-                    'confirmed',
-                    TOKEN_PROGRAM_ID
-                  )
-
-                  console.log(tokenInfo);
-                  
-                const tokenAccountInfo = await connection3.getAccountInfo(tokenInfo.address);
+                const isToken = await findLpMint(burnd.parsed.info.mint)
  
-                console.log(tokenAccountInfo);
-
-
-                // axios.post(HELIUS_RPC_API,
-                // {
-                //    "transactions": [logs.signature ]
-                //  }).then(async result=>{
-
-                //    const data = result.data[0]
-
-                //    if(data?.type =='BURN'){
-
-                //         console.log(isburn);
-                let freezeAble = true;
-                let mintable = true;
-                //         const isToken = await findLpMint(isburn.mint)
-
-                if (isburn && isToken) {
-
+                if(isToken){
+                    let freezeAble = true;
+                    let mintable = true;
                     const tokenData: any = await getToken(isToken.baseMint)
-
                     console.log(tokenData);
                     const token = tokenData?.value?.data.parsed?.info
 
@@ -112,30 +87,26 @@ const mainBurn = async (emitter) => {
                         mintable: mintable,
                         freezeAble: freezeAble,
                         burnedTime: Date.now(),
-                        burnedLpAmount: Number(isburn.amount) / 10 ** Number(isToken.lpDecimals)
+                        burnedLpAmount: Number(burnd.parsed.info.amount) / 10 ** Number(isToken.lpDecimals)
                     };
-                 //   const updated = await updateMarket(isToken.id, burned);
+                   const updated = await updateMarket(isToken.id, burned);
 
 
-                    // if (updated) {
+                    if (updated) {
 
-                    //     const isTokenUpdated = await findLpMint(isburn.mint)
-                    //     emitter.emit('NewBurn', JSON.stringify(isTokenUpdated));
-                    // }
+                        const isTokenUpdated = await findLpMint(burnd.parsed.info.mint)
+                        emitter.emit('NewBurn', JSON.stringify(isTokenUpdated));
+                    }
 
                     console.log(burned);
-                }
+                } 
 
-
-            }
-            //  })
-
-
+            } 
 
         }
+    });
 
-
-    })
+ 
 
 
 }

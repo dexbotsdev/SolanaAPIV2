@@ -1,15 +1,17 @@
  import { Mongoose } from "mongoose";
 //37qrHBf7IuDfNLpI
 //radialdapps
-const uri = "mongodb+srv://radialdapps:37qrHBf7IuDfNLpI@cluster0.cnuvoi3.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://radialdapps:37qrHBf7IuDfNLpI@cluster0.cnuvoi3.mongodb.net/solanaapi?retryWrites=true&w=majority";
 const localUri = 'mongodb://localhost:27017/solanaapi';
 
- const mongoose = new Mongoose();
+const mongoose = new Mongoose();
 // Connect to MongoDB
 mongoose.connect(localUri, {
   autoCreate: true,
   autoIndex:true
-});
+}).catch((error)=>{
+  console.log(error)
+})
 
 // Define the schema for your collection
 const userSchema = new mongoose.Schema({
@@ -43,9 +45,43 @@ const marketSchema = new mongoose.Schema({
   freezeAble:Boolean,
   tokenJson:String
 });
+
+
+const RayDiumPoolSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  baseMint: { type: String, required: true },
+  quoteMint: { type: String, required: true },
+  lpMint: { type: String, required: true },
+  baseDecimals: { type: Number, required: true },
+  quoteDecimals: { type: Number, required: true },
+  lpDecimals: { type: Number, required: true },
+  version: { type: Number, required: true },
+  programId: { type: String, required: true },
+  authority: { type: String, required: true },
+  openOrders: { type: String, required: true },
+  targetOrders: { type: String, required: true },
+  baseVault: { type: String, required: true },
+  quoteVault: { type: String, required: true },
+  withdrawQueue: { type: String, required: true },
+  lpVault: { type: String, required: true },
+  marketVersion: { type: Number, required: true },
+  marketProgramId: { type: String, required: true },
+  marketId: { type: String, required: true },
+  marketAuthority: { type: String, required: true },
+  marketBaseVault: { type: String, required: true },
+  marketQuoteVault: { type: String, required: true },
+  marketBids: { type: String, required: true },
+  marketAsks: { type: String, required: true },
+  marketEventQueue: { type: String, required: true },
+  lookupTableAccount: { type: String, required: true },
+});
+
+ 
+
 // Create the model
   const User = mongoose.model('User', userSchema);
   const Market = mongoose.model('Market', marketSchema);
+  const RayDiumPool = mongoose.model('RayDiumPool', RayDiumPoolSchema);
 
 
 
@@ -117,7 +153,22 @@ export async function createUser(userId, subscription, authtoken, enabled) {
   }
 }
 
- 
+export async function findPool(id:any) {
+  try {
+    const market = await RayDiumPool.findOne({ lpMint: id });
+    if (market) {
+       console.log('Market found:', market);
+       return market;
+    } else {
+      console.log('Market not found '+id);
+      return null;
+    }  
+  } catch (error) {
+    console.error('Error finding market:', error.message);
+    return null;
+
+  }
+}
 
 export async function findLpMint(id:any) {
   try {
@@ -126,11 +177,9 @@ export async function findLpMint(id:any) {
        console.log('Market found:', market);
        return market;
     } else {
-      console.log('Market not found');
+      console.log('Market not found '+id);
       return null;
-    }
-
- 
+    }  
   } catch (error) {
     console.error('Error finding market:', error.message);
     return null;
