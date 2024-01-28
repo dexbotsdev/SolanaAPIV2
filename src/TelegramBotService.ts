@@ -1,0 +1,165 @@
+import { Api, TelegramClient } from "telegram";
+import { StoreSession } from "telegram/sessions/index.js";
+import { EventEmitter } from 'emitter' 
+import {Button} from "telegram/tl/custom/button";
+import { text } from 'input'
+import { checkTokenHolders, shorten } from "./util/functions";
+import { newburnsChannelIds } from "./util/constants";
+import { Telegraf, Markup } from 'telegraf';
+export const TG_BOT_TOKEN="6762467361:AAEy3aiZ7L8ANVIuujK9AlxcEZnWZ5ErkRY" 
+
+
+class TelegramBotService{ 
+
+    client: Telegraf;
+    channels: any[]; 
+    em: EventEmitter;  
+ 
+
+    constructor() {
+
+       
+        this.client = new Telegraf(TG_BOT_TOKEN);
+        this.client.launch();
+        this.initClient();
+ 
+    }
+  
+    initClient = async () => { 
+  
+        const me = await this.client.telegram.getMe();  
+        this.client.start((ctx) => {
+            let message = ` Please use the /start command `
+            ctx.reply(message)
+        })
+
+        this.client.on('message', (ctx) => {
+            console.log(JSON.stringify(ctx, null, 2));
+        }) 
+    }
+
+
+    async sendBurnMessageToChannel(arg0: string) {
+        
+        const data = JSON.parse(arg0);
+        const tokenJson = JSON.parse(data.tokenJson);
+
+        const burned = data.burnedLpAmount;
+        const lpAmount = data.lpAmount;
+
+        if (lpAmount / burned > 2) return;
+
+        let baseMint = data.baseMint;
+        let quoteLiquidity = data.quoteLiquidity;
+
+        if (baseMint == 'So11111111111111111111111111111111111111112') {
+            baseMint = data.quoteMint;
+            quoteLiquidity = data.baseLiquidity;
+        }
+        const topHoplders = await checkTokenHolders(baseMint, data.lpMint);
+
+        let thumbnail = undefined;
+        // if (tokenJson) { if (tokenJson.image && tokenJson.image.indexOf('http') >= 0) thumbnail = tokenJson.image; }
+
+        let holdersTxt = '';
+        let ammpctg = '0';
+        let cnt = 10;
+        topHoplders.forEach((h) => {
+            let holderName = shorten(h.holder)
+            if (h.holder.indexOf('AMM') >= 0) {
+                ammpctg = Number(h.holderPercentage).toFixed(2);
+                holderName = 'Raydium';
+            }  
+            if (cnt > 0)
+                holdersTxt += `<a href="https://solscan.io/account/${h.holderAddress}">${holderName}</a>` + ': ' + Number(h.holderPercentage).toFixed(2) + ' % \n';
+
+            cnt--;
+
+
+        })
+
+
+
+ 
+        const openTime = Date.now() - new Date(data.openTime).getTime();
+        let timeLeft = 0;
+        if(openTime<0){
+            timeLeft = openTime/1000;
+        }
+
+        const emojis = {
+            token: '🚀',
+            id: '🆔',
+            owner: '👤',
+            creationDate: '📅',
+            lpAmount: '💧',
+            baseLiquidity: '🪙',
+            quoteLiquidity: '💲',
+            lpBurned: data.lpBurned ? '🔥' : '❌',
+            rugpulled: data.rugpulled ? '🚨' : '✅',
+            mintable: data.mintable ? '🕵️' : '🕵️',
+            freezeAble: data.freezeAble ? '🕵️' : '🕵️',
+            burnedTime: '🔥⏰',
+        };
+
+        // Format data with emojis
+        const formattedData = `
+<b>LP Burned! ${emojis.token} | $${tokenJson.symbol} | RAYDIUM</b>
+
+${emojis.token} <b>Name:</b> ${data.tokenName} 
+${emojis.owner} <b>Owner:</b>  <a href="https://solscan.io/account/${data.owner}">${shorten(data.owner)}</a>  
+${emojis.baseLiquidity} <b>Token Address:</b> <a href="https://solscan.io/account/${baseMint}">${shorten(baseMint)}</a>  
+${emojis.creationDate} <b>Creation Date:</b> ${data.creationDate} 
+${emojis.mintable} <b>Mint Renounced:</b> ${!data.mintable ? '✅' : '❌'} 
+${emojis.freezeAble} <b>Freeze Account:</b> ${!data.freezeAble ? '✅' : '❌'} 
+⏰ <b>Pool Open Time:</b> ${new Date(data.openTime)} : ${timeLeft} Secs Left to Launch 
+
+${emojis.baseLiquidity} <b>Liquidity:</b> ${Number(quoteLiquidity).toFixed(2)} SOL
+ 
+<b>Top 10 Holders:</b> 
+${holdersTxt} 
+<b>More Details:</b>
+
+${tokenJson.description}
+
+<b>Links:</b>
+<a href="https://birdeye.so/token/${baseMint}?chain=solana">Birdeye</a> | <a href="https://dexscreener.com/solana/${baseMint}">Dexscreener</a>
+
+        `;
+         
+  
+        newburnsChannelIds.forEach((newburnsChannelId)=>{
+            this.client.telegram.sendMessage(newburnsChannelId, formattedData,
+                {
+                    reply_markup:  {
+                        inline_keyboard: [
+                          
+                          [{ text: '⚡ Insta-Buy with Bonkbot', url: `https://t.me/bonkbot_bot?start=ref_vd5bb_ca_${baseMint}`}],
+                          [{ text: '🍌 Banana', url: 'https://t.me/BananaGunSolana_bot?start=ref_astral'},
+                          { text: '🦄 Unibot', url: 'https://t.me/solana_unibot?start=r-bitce0' }],
+                          [{ text: '🪐 Solareum', url: 'https://t.me/solareum_bot?start=783d5d66' },
+                          { text: '🤖 SolTradingBot', url: 'https://t.me/SolanaTradingBot?start=XDQq2MvW5'}],
+                        ],
+                      },
+                    parse_mode: 'HTML',
+                    disable_web_page_preview: true
+                })
+                .then(() => {
+                    console.log('Message sent successfully'); 
+                    return;
+                })
+                .catch((error) => {
+                    console.error('Error sending message:', error);
+                    return;
+                });
+        })
+        
+        
+      }
+
+
+
+}
+
+
+export default TelegramBotService;

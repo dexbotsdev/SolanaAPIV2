@@ -19,4 +19,9 @@ export const connection2 = new Connection(HELIUS_RPC,{commitment:'confirmed'});
 export const connection3 = new Connection('https://api.mainnet-beta.solana.com/',{commitment:'confirmed'});
 export const connectionH = new Connection(HELIUS_RPC_A,{commitment:'confirmed'});
 
+
+export const newburnsChannelIds=['-1002063926369'];
+export const newburnsChannelIdsDS=["1197749731305209876"];
+
+
  

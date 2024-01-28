@@ -15,7 +15,7 @@ const getToken = async (mint: any) => {
 }
 
 
-const mainBurn = async (emitter) => {
+const mainBurn = async (emitter,bot,dbot) => {
     connection3.onLogs(pubtok, async (logs, ctx) => {
 
 
@@ -36,8 +36,7 @@ const mainBurn = async (emitter) => {
                 door = 'closed';
             }
 
-            if (element.indexOf('Swap') > 0 || element.includes('MintTo')) door = 'X';
-        });
+         });
 
 
         if (inc == 'close' && door != 'closed') {
@@ -93,12 +92,17 @@ const mainBurn = async (emitter) => {
 
 
                     if (updated) {
+                        console.log('Market Updated for New BURN ');
 
-                        const isTokenUpdated = await findLpMint(burnd.parsed.info.mint)
-                        emitter.emit('NewBurn', JSON.stringify(isTokenUpdated));
+                        const ammPool = await findLpMint(burnd.parsed.info.mint)
+
+                        await bot.sendBurnMessageToChannel(JSON.stringify(ammPool));
+                        await dbot.sendBurnMessageToChannel(JSON.stringify(ammPool));
+                        console.log('Send Bot Calls ');
+
+                        emitter.emit('NewBurn', JSON.stringify(ammPool));
                     }
 
-                    console.log(burned);
                 } 
 
             } 
