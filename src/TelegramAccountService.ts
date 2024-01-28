@@ -4,7 +4,7 @@ import { EventEmitter } from 'emitter'
 import {Button} from "telegram/tl/custom/button";
 import { text } from 'input'
 import { checkTokenHolders, shorten } from "./util/functions";
-import { newburnsChannelId } from "./util/constants";
+import { newburnsChannelIds } from "./util/constants";
 
 
 class TelegramAccountService{ 
@@ -138,7 +138,7 @@ ${tokenJson.description}
 <a href="https://birdeye.so/token/${baseMint}?chain=solana">Birdeye</a> | <a href="https://dexscreener.com/solana/${baseMint}">Dexscreener</a>
 
         `;
-        const linkedchannel = await this.client.getInputEntity(newburnsChannelId); 
+        const linkedchannel = await this.client.getInputEntity(newburnsChannelIds[0]); 
 
 
         // await this.client.connect(); // This assumes you have already authenticated with .start()
