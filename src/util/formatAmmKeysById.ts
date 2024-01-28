@@ -9,22 +9,22 @@ import {
 import {
   PublicKey
 } from '@solana/web3.js';
-import { connection } from './constants';
+import { connectionH } from './constants';
 
 
 export default async function formatAmmKeysById(id: string): Promise<ApiPoolInfoV4> {
-  const account = await connection.getAccountInfo(new PublicKey(id))
-  if (account === null) { //console.log(' get id info error 1'); return null; }
+  const account = await connectionH.getAccountInfo(new PublicKey(id))
+  if (account === null) {  console.log(' get id info error 1'); return null; }
   const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data)
 
   const marketId = info.marketId
-  const marketAccount = await connection.getAccountInfo(marketId)
-  if (marketAccount === null) { //console.log(' get id info error 2'); return null; }
+  const marketAccount = await connectionH.getAccountInfo(marketId)
+  if (marketAccount === null) {  console.log(' get id info error 2'); return null; }
   const marketInfo = MARKET_STATE_LAYOUT_V3.decode(marketAccount.data)
 
   const lpMint = info.lpMint
-  const lpMintAccount = await connection.getAccountInfo(lpMint)
-  if (lpMintAccount === null) { //console.log(' get id info error 3'); return null; }
+  const lpMintAccount = await connectionH.getAccountInfo(lpMint)
+  if (lpMintAccount === null) { console.log(' get id info error 3'); return null; }
   const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data)
 
   return {
