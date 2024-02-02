@@ -6,8 +6,10 @@ const knownAccounts = JSON.parse('{"5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1
 
 
 export const shorten = (str) => {
-    if (str.length < 10) return str;
-    return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
+
+    if(str){
+    if (str?.length < 10) return str;
+    return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;}
   };
 
 export const checkTokenHolders = async (token, lpMint) => {

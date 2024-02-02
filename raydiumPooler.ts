@@ -21,7 +21,7 @@ async function insertDataIntoMongoDB(data: any): Promise<void> {
     await client.connect();
     const db = client.db('solanaapi'); // Change 'raydium' to your preferred database name
 
-    const collection = db.collection('RayDiumPool');
+    const collection = db.collection('newraydiumpools');
 
     await collection.deleteMany({}).then(async (done) => {
       // Assuming you want to insert both official and unofficial pools
@@ -55,5 +55,5 @@ async function run(): Promise<void> {
 }
 
 // Run the script initially and then every hour using a scheduler like cron.
-
-setInterval(() => run(), 120000);
+run()
+//setInterval(() => , 120000);

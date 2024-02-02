@@ -5,7 +5,7 @@ import {Button} from "telegram/tl/custom/button";
 import { text } from 'input'
 import { checkTokenHolders, shorten } from "./util/functions";
 import { newburnsChannelIds } from "./util/constants";
-import { Telegraf, Markup } from 'telegraf';
+import { Telegraf, session } from "telegraf";
 export const TG_BOT_TOKEN="6762467361:AAEy3aiZ7L8ANVIuujK9AlxcEZnWZ5ErkRY" 
 
 
@@ -19,7 +19,8 @@ class TelegramBotService{
     constructor() {
 
        
-        this.client = new Telegraf(TG_BOT_TOKEN);
+        this.client = new Telegraf(TG_BOT_TOKEN,);
+        this.client.use(session());
         this.client.launch();
         this.initClient();
  
@@ -42,15 +43,18 @@ class TelegramBotService{
     async sendBurnMessageToChannel(arg0: string) {
         
         const data = JSON.parse(arg0);
-        const tokenJson = JSON.parse(data.tokenJson);
+        const tokenJson = data?.tokenJson? JSON.parse(data?.tokenJson):'';
+
+        console.log('sendBurnMessageToChannel');
+        console.log(data);
 
         const burned = data.burnedLpAmount;
         const lpAmount = data.lpAmount;
 
-        if (lpAmount / burned > 2) return;
+        if (lpAmount / burned > 4) return;
 
         let baseMint = data.baseMint;
-        let quoteLiquidity = data.quoteLiquidity;
+        let quoteLiquidity = data.quoteReserve ? data.quoteReserve/(10**data.quoteDecimals) : '';
 
         if (baseMint == 'So11111111111111111111111111111111111111112') {
             baseMint = data.quoteMint;
@@ -81,10 +85,10 @@ class TelegramBotService{
 
 
  
-        const openTime = Date.now() - new Date(data.openTime).getTime();
+        const openTime = Date.now() - new Date(data.startTime).getTime();
         let timeLeft = 0;
         if(openTime<0){
-            timeLeft = openTime/1000;
+            timeLeft = -openTime/1000;
         }
 
         const emojis = {
@@ -102,17 +106,18 @@ class TelegramBotService{
             burnedTime: '🔥⏰',
         };
 
+
+        const sym = tokenJson? tokenJson?.symbol:data.tokenName;
         // Format data with emojis
         const formattedData = `
-<b>LP Burned! ${emojis.token} | $${tokenJson.symbol} | RAYDIUM</b>
+<b>LP Burned! ${emojis.token} | $${sym} | RAYDIUM</b>
 
 ${emojis.token} <b>Name:</b> ${data.tokenName} 
-${emojis.owner} <b>Owner:</b>  <a href="https://solscan.io/account/${data.owner}">${shorten(data.owner)}</a>  
 ${emojis.baseLiquidity} <b>Token Address:</b> <a href="https://solscan.io/account/${baseMint}">${shorten(baseMint)}</a>  
-${emojis.creationDate} <b>Creation Date:</b> ${data.creationDate} 
+${emojis.creationDate} <b>Creation Date:</b> ${new Date(data.creationDate).toUTCString()} 
 ${emojis.mintable} <b>Mint Renounced:</b> ${!data.mintable ? '✅' : '❌'} 
 ${emojis.freezeAble} <b>Freeze Account:</b> ${!data.freezeAble ? '✅' : '❌'} 
-⏰ <b>Pool Open Time:</b> ${new Date(data.openTime)} : ${timeLeft} Secs Left to Launch 
+⏰ <b>Pool Open Time:</b> ${new Date(Number(data.startTime)).toUTCString()} : ${timeLeft} Secs Left to Launch 
 
 ${emojis.baseLiquidity} <b>Liquidity:</b> ${Number(quoteLiquidity).toFixed(2)} SOL
  
@@ -120,7 +125,7 @@ ${emojis.baseLiquidity} <b>Liquidity:</b> ${Number(quoteLiquidity).toFixed(2)} S
 ${holdersTxt} 
 <b>More Details:</b>
 
-${tokenJson.description}
+${tokenJson?.description}
 
 <b>Links:</b>
 <a href="https://birdeye.so/token/${baseMint}?chain=solana">Birdeye</a> | <a href="https://dexscreener.com/solana/${baseMint}">Dexscreener</a>
@@ -134,12 +139,12 @@ ${tokenJson.description}
                     reply_markup:  {
                         inline_keyboard: [
                           
-                          [{ text: '⚡ Insta-Buy with Bonkbot', url: `https://t.me/bonkbot_bot?start=ref_vd5bb_ca_${baseMint}`}],
+                          [{ text: '⚡ Insta-Buy with Bonkbot', url: `https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint}`}],
                           [{ text: '🍌 Banana', url: 'https://t.me/BananaGunSolana_bot?start=ref_astral'},
-                          { text: '🦄 Unibot', url: 'https://t.me/solana_unibot?start=r-bitce0' }],
+                          { text: '🦄 Unibot', url: 'https://t.me/solana_unibot?start=r-dexbotsdev' }],
                           [{ text: '🪐 Solareum', url: 'https://t.me/solareum_bot?start=783d5d66' },
-                          { text: '🤖 SolTradingBot', url: 'https://t.me/SolanaTradingBot?start=XDQq2MvW5'}],
-                        ],
+                          { text: '🤖 SolTradingBot', url: `https://t.me/SolanaTradingBot?start=${baseMint}-w7XyTrwMT`}],
+                         ],
                       },
                     parse_mode: 'HTML',
                     disable_web_page_preview: true

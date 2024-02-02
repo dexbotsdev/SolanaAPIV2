@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { HELIUS_RPC_A, HELIUS_RPC_API, connection2, connection3, connectionH } from './util/constants';
-import { findLpMint, findPool, updateMarket } from "./db/db";
+import { findLpMint,  updateMarket } from "./db/db";
 import parseBurnTx from "./util/parseBurn";
 import axios from "axios";
 import { TOKEN_PROGRAM_ID, getAccount } from "@solana/spl-token";
@@ -57,7 +57,7 @@ const LpBurnTrackerService = async () => {
                 console.log(new Date().toLocaleTimeString());
                  console.log(isBurnTx[0]);
  
-                const isToken = await findPool(burnd.parsed.info.mint)
+                const isToken = await findLpMint(burnd.parsed.info.mint)
  
                 console.log(isToken);
 

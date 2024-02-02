@@ -43,45 +43,61 @@ const marketSchema = new mongoose.Schema({
   burnedLpAmount:Number,
   mintable:Boolean,
   freezeAble:Boolean,
-  tokenJson:String
-});
-
-
-const RayDiumPoolSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  baseMint: { type: String, required: true },
-  quoteMint: { type: String, required: true },
-  lpMint: { type: String, required: true },
-  baseDecimals: { type: Number, required: true },
-  quoteDecimals: { type: Number, required: true },
-  lpDecimals: { type: Number, required: true },
-  version: { type: Number, required: true },
-  programId: { type: String, required: true },
-  authority: { type: String, required: true },
-  openOrders: { type: String, required: true },
-  targetOrders: { type: String, required: true },
-  baseVault: { type: String, required: true },
-  quoteVault: { type: String, required: true },
-  withdrawQueue: { type: String, required: true },
-  lpVault: { type: String, required: true },
-  marketVersion: { type: Number, required: true },
-  marketProgramId: { type: String, required: true },
-  marketId: { type: String, required: true },
-  marketAuthority: { type: String, required: true },
-  marketBaseVault: { type: String, required: true },
-  marketQuoteVault: { type: String, required: true },
-  marketBids: { type: String, required: true },
-  marketAsks: { type: String, required: true },
-  marketEventQueue: { type: String, required: true },
-  lookupTableAccount: { type: String, required: true },
+  tokenJson:String, 
 });
 
  
 
+const RayDiumPoolSchema = new mongoose.Schema({
+  status: String,
+  baseDecimals: Number,
+  quoteDecimals: Number,
+  lpDecimals: Number,
+  baseReserve: String,
+  quoteReserve: String,
+  lpSupply: String,
+  startTime: String,
+  id: String,
+  baseMint: String,
+  quoteMint: String,
+  lpMint: String,
+  version: Number,
+  programId: String,
+  authority: String,
+  openOrders: String,
+  targetOrders: String,
+  baseVault: String,
+  quoteVault: String,
+  withdrawQueue: String,
+  lpVault: String,
+  marketVersion: Number,
+  marketProgramId: String,
+  marketId: String,
+  marketAuthority: String,
+  marketBaseVault: String,
+  marketQuoteVault: String,
+  marketBids: String,
+  marketAsks: String,
+  marketEventQueue: String,
+  lookupTableAccount: String,
+  lpBurned:Boolean,
+  rugpulled:Boolean,
+  burnedTime:Date,
+  rugpulledTime:Date,
+  burnedLpAmount:Number,
+  mintable:Boolean,
+  freezeAble:Boolean,
+  tokenJson:String, 
+  owner:String,
+  creationDate:{type:Date, default:Date.now()},
+  tokenName: String,
+  
+});
+
 // Create the model
   const User = mongoose.model('User', userSchema);
   const Market = mongoose.model('Market', marketSchema);
-  const RayDiumPool = mongoose.model('RayDiumPool', RayDiumPoolSchema);
+  const RayDiumPool = mongoose.model('NewRaydiumPool', RayDiumPoolSchema);
 
 
 
@@ -145,19 +161,19 @@ export async function createUser(userId, subscription, authtoken, enabled) {
 
   export async function createMarket(marketData) {
   try {
-    const market = new Market(marketData);
+    const market = new RayDiumPool(marketData);
     await market.save();
      console.log('Market created successfully');
   } catch (error) {
     console.error('Error creating market:', error.message);
   }
 }
-
-export async function findPool(id:any) {
+ 
+export async function findLpMint(id:any) {
   try {
     const market = await RayDiumPool.findOne({ lpMint: id });
     if (market) {
-       console.log('Market found:', market);
+       console.log('Market for LPMint  found:', market);
        return market;
     } else {
       console.log('Market not found '+id);
@@ -170,42 +186,11 @@ export async function findPool(id:any) {
   }
 }
 
-export async function findLpMint(id:any) {
-  try {
-    const market = await Market.findOne({ lpMint: id });
-    if (market) {
-       console.log('Market found:', market);
-       return market;
-    } else {
-      console.log('Market not found '+id);
-      return null;
-    }  
-  } catch (error) {
-    console.error('Error finding market:', error.message);
-    return null;
-
-  }
-}
-
-  export async function findMarket(id) {
-  try {
-    const market = await Market.findOne({ id });
-    if (market) {
-       console.log('Market found:', market);
-    } else {
-       console.log('Market not found');
-    }
-
-    return market;
-
-  } catch (error) {
-    console.error('Error finding market:', error.message);
-  }
-}
+ 
 
 export async function updateMarket(id, updateFields) {
   try {
-    const result = await Market.updateOne({ id }, { $set: updateFields });
+    const result = await RayDiumPool.updateOne({ id }, { $set: updateFields });
     if (result.modifiedCount > 0) {
        console.log('Market updated successfully');
       return true;

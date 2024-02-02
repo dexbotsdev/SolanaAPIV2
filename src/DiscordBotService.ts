@@ -28,7 +28,9 @@ class DiscordBotService {
     async sendBurnMessageToChannel(arg0: string) {
 
         const data = JSON.parse(arg0);
-        const tokenJson = JSON.parse(data.tokenJson);
+        const tokenJson = data?.tokenJson? JSON.parse(data?.tokenJson):'';
+
+        let symbol = tokenJson? tokenJson.symbol.substring(1,8):data.tokenName.substring(1,8)
 
         const burned = data.burnedLpAmount;
         const lpAmount = data.lpAmount;
@@ -36,7 +38,7 @@ class DiscordBotService {
         if (lpAmount / burned > 2) return;
 
         let baseMint = data.baseMint;
-        let quoteLiquidity = data.quoteLiquidity;
+        let quoteLiquidity = data.quoteReserve ? data.quoteReserve/(10**data.quoteDecimals) : '';
 
         if (baseMint == 'So11111111111111111111111111111111111111112') {
             baseMint = data.quoteMint;
@@ -67,7 +69,7 @@ class DiscordBotService {
 
 
 
-        const openTime = Date.now() - new Date(data.openTime).getTime();
+        const openTime = Date.now() - new Date(data.startTime).getTime();
         let timeLeft = 0;
         if (openTime < 0) {
             timeLeft = openTime / 1000;
@@ -90,7 +92,7 @@ class DiscordBotService {
 
         const embed = new MessageEmbed()
             .setColor('#3498db') // Set embed color (Blue in this example)
-            .setTitle(`🔥 LP TOKEN BURNED | $${tokenJson.symbol} | Raydium 🔥 `)
+            .setTitle(`🔥 LP TOKEN BURNED | $${symbol} | Raydium 🔥 `)
             .setDescription(`
             **Mint Address:** 
             [${baseMint}](https://solscan.io/address/${baseMint})
@@ -98,7 +100,7 @@ class DiscordBotService {
             **Name : **  ${data.tokenName}
             **Description : **
             ${tokenJson?.description}
-            **Pool Open Time:** ${new Date(data.openTime)} : ${timeLeft} Secs Left to Launch 
+            **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : ${timeLeft} Secs Left to Launch 
 
             **Authority renounced :** ${!data.mintable ? `✅` : `❌`} 
             **Freezing Disabled :** ${!data.freezeAble ? `✅` : `❌`} 
@@ -111,9 +113,9 @@ class DiscordBotService {
             ${holdersTxt}
         `)
             .addField('Links',
-                `[BirdEye](https://solscan.io/address/${data.baseMint}) | [Dexscreener](https://solscan.io/address/${data.baseMint}) | [Rugcheck](https://solscan.io/address/${data.baseMint}) | [Raydium](https://solscan.io/address/${data.baseMint})`)
+                `[BirdEye](https://birdeye.so/token/${baseMint}?chain=solana) | [Dexscreener](https://dexscreener.com/solana/${baseMint}) `)
             .addField(' ',
-                `[Insta-Buy⚡]( https://t.me/bonkbot_bot?start=ref_vd5bb) [🤖  Fluxbot](https://solscan.io/address/${data.baseMint}) [🌐 Join Us!](https://solscan.io/address/${data.baseMint})`)
+                `[Insta-Buy⚡]( https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint}) [🤖  BonkBot](https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint})  [🤖  SolTradingBot](https://t.me/SolanaTradingBot?start=${baseMint}-w7XyTrwMT)  [🤖 Unibot] (https://t.me/solana_unibot?start=r-dexbotsdev) [🌐 Join Us!](https://discord.gg/KYMRRHGE)`)
 
             .setTimestamp();
 
@@ -122,8 +124,8 @@ class DiscordBotService {
 
         const button = new MessageButton()
             .setStyle('LINK')
-            .setLabel('View on Solana Explorer')
-            .setURL(`https://solscan.io/address/${data.id}`);
+            .setLabel('⚡ Insta-Buy with Bonkbot')
+            .setURL(`https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint}`);
 
         // Create an action row with the button
         const row = new MessageActionRow().addComponents(button);

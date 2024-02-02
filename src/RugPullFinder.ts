@@ -16,7 +16,7 @@ const getToken = async (mint: any) => {
 }
  
 
-const mainRugpull = async (emitter) => {
+const mainRugpull = async () => {
     const authPool = new PublicKey('675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8');
 
     console.log('Rugpull Detector Started')
@@ -94,7 +94,7 @@ const mainRugpull = async (emitter) => {
                       //  console.log(rugPull);
     
     
-                        emitter.emit('RugPull', JSON.stringify(rugPull));
+                         
     
     
                         const isToken = await findLpMint(isburn.mint)
