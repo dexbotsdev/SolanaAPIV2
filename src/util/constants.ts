@@ -21,7 +21,7 @@ export const connectionH = new Connection(HELIUS_RPC_A,{commitment:'confirmed'})
 
 
 export const newburnsChannelIds=['-1002063926369'];
-export const newburnsChannelIdsDS=["1197749731305209876"];
+export const newburnsChannelIdsDS=["1197749731305209876","1198118277642203187"];
 
 
  
