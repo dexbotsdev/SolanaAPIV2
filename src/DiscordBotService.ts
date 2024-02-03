@@ -100,7 +100,7 @@ class DiscordBotService {
             **Name : **  ${data.tokenName}
             **Description : **
             ${tokenJson?.description}
-            **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : ${timeLeft} Secs Left to Launch 
+            **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : <t:${parseInt(''+Date.now()/1000)}:R>  
 
             **Authority renounced :** ${!data.mintable ? `✅` : `❌`} 
             **Freezing Disabled :** ${!data.freezeAble ? `✅` : `❌`} 
@@ -108,8 +108,7 @@ class DiscordBotService {
             **Liquidity | Pool allocation :** 
             ${quoteLiquidity} SOL | ${ammpctg} %
 
-            Top 10 Holders :
-
+            **Top 10 Holders :**
             ${holdersTxt}
         `)
             .addField('Links',

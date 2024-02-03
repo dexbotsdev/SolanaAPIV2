@@ -20,7 +20,7 @@ const getToken = async (mint: any) => {
 }
 
 const sent = []
-
+        
 const mainBurn = async (  bot, dbot) => {
     connectionH.onLogs(pubtok, async (logs, ctx) => {
 
@@ -97,7 +97,7 @@ const mainBurn = async (  bot, dbot) => {
                     const updated = await updateMarket(isToken.id, burned);
 
 
-                    if (updated) {
+                    if (burned.lpBurned) {
                         console.log('Market Updated for New BURN ');
 
                         const ammPool = await findLpMint(burnd.parsed.info.mint)
