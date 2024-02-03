@@ -28,9 +28,9 @@ class DiscordBotService {
     async sendBurnMessageToChannel(arg0: string) {
 
         const data = JSON.parse(arg0);
-        const tokenJson = data?.tokenJson? JSON.parse(data?.tokenJson):'';
+        const tokenJson = data?.tokenJson ? JSON.parse(data?.tokenJson) : '';
 
-        let symbol = tokenJson? tokenJson.symbol.substring(1,8):data.tokenName.substring(1,8)
+        let symbol = tokenJson ? tokenJson.symbol.substring(1, 8) : data.tokenName.substring(1, 8)
 
         const burned = data.burnedLpAmount;
         const lpAmount = data.lpAmount;
@@ -38,7 +38,7 @@ class DiscordBotService {
         if (lpAmount / burned > 2) return;
 
         let baseMint = data.baseMint;
-        let quoteLiquidity = data.quoteReserve ? data.quoteReserve/(10**data.quoteDecimals) : '';
+        let quoteLiquidity = data.quoteReserve ? data.quoteReserve / (10 ** data.quoteDecimals) : '';
 
         if (baseMint == 'So11111111111111111111111111111111111111112') {
             baseMint = data.quoteMint;
@@ -100,7 +100,7 @@ class DiscordBotService {
             **Name : **  ${data.tokenName}
             **Description : **
             ${tokenJson?.description}
-            **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : <t:${parseInt(''+Date.now()/1000)}:R>  
+            **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : <t:${parseInt('' + Date.now() / 1000)}:R>  
 
             **Authority renounced :** ${!data.mintable ? `✅` : `❌`} 
             **Freezing Disabled :** ${!data.freezeAble ? `✅` : `❌`} 
@@ -112,26 +112,35 @@ class DiscordBotService {
             ${holdersTxt}
         `)
             .addField('Links',
-                `[BirdEye](https://birdeye.so/token/${baseMint}?chain=solana) | [Dexscreener](https://dexscreener.com/solana/${baseMint}) `)
-            .addField(' ',
-                `[Insta-Buy⚡]( https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint}) [🤖  BonkBot](https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint})  [🤖  SolTradingBot](https://t.me/SolanaTradingBot?start=${baseMint}-w7XyTrwMT)  [🤖 Unibot] (https://t.me/solana_unibot?start=r-dexbotsdev) [🌐 Join Us!](https://discord.gg/KYMRRHGE)`)
-
+                `[BirdEye](https://birdeye.so/token/${baseMint}?chain=solana) | [Dexscreener](https://dexscreener.com/solana/${baseMint}) `)  
             .setTimestamp();
 
         if (thumbnail) embed.setThumbnail(thumbnail);
 
 
-        const button = new MessageButton()
+        const bonkbot = new MessageButton()
             .setStyle('LINK')
-            .setLabel('⚡ Insta-Buy with Bonkbot')
+            .setLabel('⚡ Insta-Buy')
             .setURL(`https://t.me/bonkbot_bot?start=ref_w76tg_ca_${baseMint}`);
+        const soltrad = new MessageButton()
+            .setStyle('LINK')
+            .setLabel('🤖  SolTrading')
+            .setURL(`https://t.me/SolanaTradingBot?start=${baseMint}-w7XyTrwMT`);
+        const unibot = new MessageButton()
+            .setStyle('LINK')
+            .setLabel('🤖 Unibot')
+            .setURL(`https://t.me/solana_unibot?start=r-dexbotsdev`);
+        const joinUs = new MessageButton()
+            .setStyle('LINK')
+            .setLabel('🌐 Join Us!')
+            .setURL(`https://discord.gg/KYMRRHGE`); 
 
         // Create an action row with the button
-        const row = new MessageActionRow().addComponents(button);
+        const row = new MessageActionRow().addComponents([bonkbot,soltrad,unibot,joinUs]);
 
 
         newburnsChannelIdsDS.forEach((channelId) => {
-            const channel = this.client.channels.cache.get(channelId); 
+            const channel = this.client.channels.cache.get(channelId);
             channel.send({ embeds: [embed], components: [row] });
         })
 
