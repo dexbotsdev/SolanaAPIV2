@@ -9,7 +9,7 @@ import { Telegraf, session } from "telegraf";
 export const TG_BOT_TOKEN="6762467361:AAEy3aiZ7L8ANVIuujK9AlxcEZnWZ5ErkRY" 
 
 
-class TelegramBotService{ 
+class TelegramBurnedPoolBotService{ 
 
     client: Telegraf;
     channels: any[]; 
@@ -167,4 +167,4 @@ ${tokenJson?.description}
 }
 
 
-export default TelegramBotService;
+export default TelegramBurnedPoolBotService;

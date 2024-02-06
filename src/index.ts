@@ -1,7 +1,7 @@
 import mainBurn from "./NewBurnFinder";
 import mainRugpull from './RugPullFinder';
-import TelegramBotService from './TelegramBotService';
-import DiscordBotService from './DiscordBotService';
+import TelegramBurnedPoolBotService from './TelegramBurnedPoolBotService';
+import DiscordBotNewBurnsService from './DiscordBotNewBurnsService';
 import BRPCService from './BRPCService';
  
 
@@ -9,8 +9,8 @@ import BRPCService from './BRPCService';
 const solanaApi = async () => {
  
   try {
-    const bot = new TelegramBotService();
-    const dbot = new DiscordBotService();
+    const bot = new TelegramBurnedPoolBotService();
+    const dbot = new DiscordBotNewBurnsService();
     new BRPCService();
     mainBurn(bot, dbot);
     mainRugpull();

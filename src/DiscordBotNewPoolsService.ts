@@ -1,13 +1,13 @@
 import { EventEmitter } from 'emitter'
 import { checkTokenHolders, shorten } from "./util/functions";
-import { newburnsChannelIds, newburnsChannelIdsDS } from "./util/constants";
+import {  newpoolsChannelIdsDS } from "./util/constants";
 import pkg, { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 const { Client, Intents } = pkg;
 
-export const BOT_TOKEN = "MTE5Nzc1MDk3MzMzOTI4NzU3NQ.GXUwsv.4-neuKvv0uX1pa545AbKDEE22zXvJOCQ963ZPU"
+export const BOT_TOKEN = "MTIwMzM0OTUwNDk3MjI5NjM0NA.G-fc2s.wwSM2jLlufBbfx-JqM3nmn4sGo146s3J4JZDCc"
 
 
-class DiscordBotService {
+class DiscordBotNewPoolsService {
 
     client;
     channels: any[];
@@ -25,7 +25,7 @@ class DiscordBotService {
 
 
 
-    async sendBurnMessageToChannel(arg0: string) {
+    async sendNewPoolMessageToChannel(arg0: string) {
 
         const data = JSON.parse(arg0);
         const tokenJson = data?.tokenJson ? JSON.parse(data?.tokenJson) : '';
@@ -91,8 +91,8 @@ class DiscordBotService {
         };
 
         const embed = new MessageEmbed()
-            .setColor('#3498db') // Set embed color (Blue in this example)
-            .setTitle(`🔥 LP TOKEN BURNED | $${symbol} | Raydium 🔥 `)
+            .setColor('#ff98db') // Set embed color (Blue in this example)
+            .setTitle(`🔥 NEW LP TOKEN For | $${symbol} | Raydium 🔥 `)
             .setDescription(`
             **Mint Address:** 
             [${baseMint}](https://solscan.io/address/${baseMint})
@@ -103,7 +103,6 @@ class DiscordBotService {
             **Pool Open Time:** ${new Date(Number(data.startTime)).toUTCString()} : <t:${parseInt('' + Date.now() / 1000)}:R>  
 
             **Authority renounced :** ${!data.mintable ? `✅` : `❌`} 
-            **Freezing Disabled :** ${!data.freezeAble ? `✅` : `❌`} 
             
             **Liquidity | Pool allocation :** 
             ${quoteLiquidity} SOL | ${ammpctg} %
@@ -139,7 +138,7 @@ class DiscordBotService {
         const row = new MessageActionRow().addComponents([bonkbot,soltrad,unibot,joinUs]);
 
 
-        newburnsChannelIdsDS.forEach((channelId) => {
+        newpoolsChannelIdsDS.forEach((channelId) => {
             const channel = this.client.channels.cache.get(channelId);
             channel.send({ embeds: [embed], components: [row] });
         })
@@ -152,4 +151,4 @@ class DiscordBotService {
 }
 
 
-export default DiscordBotService;
+export default DiscordBotNewPoolsService;

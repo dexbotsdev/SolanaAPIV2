@@ -24,4 +24,6 @@ export const newburnsChannelIds=['-1002063926369'];
 export const newburnsChannelIdsDS=["1197749731305209876","1198118277642203187"];
 
 
- 
+export const newpoolsChannelIdsDS=["1197749680315056218","1203353112694489138"];
+export const newpoolsChannelIds=['-1002016660418'];
+
