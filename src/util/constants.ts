@@ -15,9 +15,9 @@ export const HELIUS_RPC='https://mainnet.helius-rpc.com/?api-key=7bf65758-6b7e-4
 export const HELIUS_RPC_A='https://mainnet.helius-rpc.com/?api-key=cfd3281b-fabc-4c1f-a18f-1b118e381938'
 export const HELIUS_RPC_API='https://api.helius.xyz/v0/transactions?api-key=cfd3281b-fabc-4c1f-a18f-1b118e381938'
 export const connection1 = new Connection(ALCHEMY_SOL_RPC,{commitment:'confirmed'});
-export const connection2 = new Connection(HELIUS_RPC_A,{commitment:'confirmed'});
+export const connection2 = new Connection(HELIUS_RPC,{commitment:'confirmed'});
 export const connection3 = new Connection('https://api.mainnet-beta.solana.com/',{commitment:'confirmed'});
-export const connectionH = new Connection(HELIUS_RPC,{commitment:'finalized'});
+export const connectionH = new Connection(HELIUS_RPC_A,{commitment:'confirmed'});
 
 
 export const newburnsChannelIds=['-1002063926369'];
