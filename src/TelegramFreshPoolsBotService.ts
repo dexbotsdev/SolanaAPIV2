@@ -45,7 +45,7 @@ class TelegramFreshPoolsBotService{
         const data = JSON.parse(arg0);
         const tokenJson = data?.tokenJson? JSON.parse(data?.tokenJson):'';
 
-        console.log('sendBurnMessageToChannel');
+        console.log('sendNewPoolMessageToChannel');
         console.log(data);
 
         const burned = data.burnedLpAmount;
@@ -62,12 +62,15 @@ class TelegramFreshPoolsBotService{
         }
         const topHoplders = await checkTokenHolders(baseMint, data.lpMint);
 
+        
         let thumbnail = undefined;
         // if (tokenJson) { if (tokenJson.image && tokenJson.image.indexOf('http') >= 0) thumbnail = tokenJson.image; }
 
         let holdersTxt = '';
         let ammpctg = '0';
         let cnt = 10;
+
+        if(topHoplders != null)
         topHoplders.forEach((h) => {
             let holderName = shorten(h.holder)
             if (h.holder.indexOf('AMM') >= 0) {

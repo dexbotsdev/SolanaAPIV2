@@ -14,7 +14,11 @@ export const shorten = (str) => {
 
 export const checkTokenHolders = async (token, lpMint) => {
 
-    const holders = await connectionH.getTokenLargestAccounts(new PublicKey(token), "confirmed")
+    let holders = null;
+    let holderData=null;
+    try{
+     
+      holders = await connectionH.getTokenLargestAccounts(new PublicKey(token), "confirmed")
 
     const topHolders = holders.value
     const holderKeys = [];
@@ -62,8 +66,12 @@ export const checkTokenHolders = async (token, lpMint) => {
             }
         })
     }
-
-   // console.log(holderData);
+   
+    } catch(error){
+        console.log('No Holders Found');
+        return null;
+    }
+   
 
     return holderData;
 }

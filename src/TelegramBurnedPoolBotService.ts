@@ -68,6 +68,9 @@ class TelegramBurnedPoolBotService{
         let holdersTxt = '';
         let ammpctg = '0';
         let cnt = 10;
+
+        if(topHoplders != null)
+
         topHoplders.forEach((h) => {
             let holderName = shorten(h.holder)
             if (h.holder.indexOf('AMM') >= 0) {
